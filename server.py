@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+﻿from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -247,7 +247,7 @@ async def update_publication(pub_id: str, input: PublicationUpdate):
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
     result = await database.publications.find_one_and_update(
-        {"id": pub_id}, {"$set": update_data}, return_document=True, projection={"_id": 0}
+        {"id": pub_id}, {"": update_data}, return_document=True, projection={"_id": 0}
     )
     if not result:
         raise HTTPException(status_code=404, detail="Publication not found")
@@ -351,7 +351,7 @@ async def update_booking_status(booking_id: str, input: BookingStatusUpdate):
     if input.status not in ["pending", "confirmed", "cancelled"]:
         raise HTTPException(status_code=400, detail="Invalid status")
     result = await database.bookings.find_one_and_update(
-        {"id": booking_id}, {"$set": {"status": input.status}}, return_document=True, projection={"_id": 0}
+        {"id": booking_id}, {"": {"status": input.status}}, return_document=True, projection={"_id": 0}
     )
     if not result:
         raise HTTPException(status_code=404, detail="Booking not found")
@@ -387,7 +387,7 @@ async def get_booked_slots():
     """Return dates/times that are already booked (for calendar display)"""
     database = await get_database()
     bookings = await database.bookings.find(
-        {"status": {"$ne": "cancelled"}},
+        {"status": {"": "cancelled"}},
         {"_id": 0, "date": 1, "time": 1}
     ).to_list(500)
     return bookings
@@ -501,7 +501,7 @@ async def update_faq_item(item_id: str, input: FAQItemUpdate):
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
     result = await database.faq_items.find_one_and_update(
-        {"id": item_id}, {"$set": update_data}, return_document=True, projection={"_id": 0}
+        {"id": item_id}, {"": update_data}, return_document=True, projection={"_id": 0}
     )
     if not result:
         raise HTTPException(status_code=404, detail="FAQ item not found")
@@ -544,7 +544,7 @@ async def update_service_package(package_id: str, input: ServicePackageUpdate):
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
     result = await database.service_packages.find_one_and_update(
-        {"id": package_id}, {"$set": update_data}, return_document=True, projection={"_id": 0}
+        {"id": package_id}, {"": update_data}, return_document=True, projection={"_id": 0}
     )
     if not result:
         raise HTTPException(status_code=404, detail="Service package not found")
@@ -676,20 +676,30 @@ logger = logging.getLogger(__name__)
 @app.on_event("startup")
 async def startup_db_client():
     try:
-        logger.info("Starting startup...")
+        logger.info("Starting startup - connecting to DB...")
         await get_database()
-        logger.info("Database connected, seeding...")
-        await seed_publications()
-        logger.info("Seeded publications")
-        await seed_faq_items()
-        logger.info("Seeded FAQ")
-        await seed_service_packages()
-        logger.info("Seeded services")
-        logger.info("Database connection initialized")
+        logger.info("Database connected.")
+        
+        # Launch seeding in the background so startup completes immediately
+        asyncio.create_task(seed_all_data())
+        
+        logger.info("Startup complete - server is ready to accept connections.")
     except Exception as e:
-        logger.error(f"Startup failed: {e}")
-        # Re-raise to prevent server from starting if DB is critical
+        logger.error(f"Critical startup failure: {e}")
         raise
+
+async def seed_all_data():
+    """Perform seeding in the background after startup."""
+    try:
+        logger.info("Background seeding: publications...")
+        await seed_publications()
+        logger.info("Background seeding: FAQ...")
+        await seed_faq_items()
+        logger.info("Background seeding: services...")
+        await seed_service_packages()
+        logger.info("Background seeding completed.")
+    except Exception as e:
+        logger.error(f"Background seeding failed: {e}")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
