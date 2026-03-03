@@ -29,8 +29,10 @@ db = None
 async def get_database():
     global client, db
     if client is None:
+        logger.info("Creating MongoDB client...")
         client = AsyncIOMotorClient(mongo_url)
         db = client[os.environ.get('DB_NAME', 'ai_governance')]
+        logger.info("MongoDB client created.")
     return db
 
 app = FastAPI()
@@ -673,11 +675,21 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def startup_db_client():
-    await get_database()
-    await seed_publications()
-    await seed_faq_items()
-    await seed_service_packages()
-    logger.info("Database connection initialized")
+    try:
+        logger.info("Starting startup...")
+        await get_database()
+        logger.info("Database connected, seeding...")
+        await seed_publications()
+        logger.info("Seeded publications")
+        await seed_faq_items()
+        logger.info("Seeded FAQ")
+        await seed_service_packages()
+        logger.info("Seeded services")
+        logger.info("Database connection initialized")
+    except Exception as e:
+        logger.error(f"Startup failed: {e}")
+        # Re-raise to prevent server from starting if DB is critical
+        raise
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
