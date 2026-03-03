@@ -29,8 +29,13 @@ db = None
 async def get_database():
     global client, db
     if client is None:
-        logger.info("Creating MongoDB client...")
-        client = AsyncIOMotorClient(mongo_url)
+        logger.info("Creating MongoDB client with TLS...")
+        # Force TLS and allow invalid certificates temporarily for debugging
+        client = AsyncIOMotorClient(
+            mongo_url,
+            tls=True,
+            tlsAllowInvalidCertificates=True   # Remove this after confirming connection works
+        )
         db = client[os.environ.get('DB_NAME', 'ai_governance')]
         logger.info("MongoDB client created.")
     return db
@@ -38,7 +43,7 @@ async def get_database():
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
-# ─── Models ───
+# ─── Models (unchanged) ───
 
 class StatusCheck(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -203,7 +208,7 @@ async def root_health_check():
 async def root():
     return {"message": "Hello World"}
 
-# ─── Status (existing) ───
+# ─── Status ───
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
