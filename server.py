@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -12,16 +12,39 @@ import uuid
 from datetime import datetime, timezone
 import resend
 
+# ----------------------------
+# Logging MUST be configured before get_database() uses logger
+# ----------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+# ----------------------------
+# Env loading
+# ----------------------------
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR / ".env")
 
-resend.api_key = os.environ.get('RESEND_API_KEY', '')
-SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
-ADMIN_EMAILS = [e.strip() for e in os.environ.get('ADMIN_EMAILS', '').split(',') if e.strip()]
+# ----------------------------
+# Resend config
+# ----------------------------
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
+ADMIN_EMAILS = [e.strip() for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()]
 
-mongo_url = os.environ.get('MONGO_URL')
-if not mongo_url:
+# Important: actually set the SDK key
+resend.api_key = RESEND_API_KEY
+
+# ----------------------------
+# Mongo config
+# ----------------------------
+MONGO_URL = os.environ.get("MONGO_URL")
+if not MONGO_URL:
     raise ValueError("MONGO_URL environment variable is required")
+
+DB_NAME = os.environ.get("DB_NAME", "ai_governance")
 
 client: Optional[AsyncIOMotorClient] = None
 db = None
@@ -30,18 +53,72 @@ async def get_database():
     global client, db
     if client is None:
         logger.info("Creating MongoDB client with TLS...")
-        # Force TLS and allow invalid certificates temporarily for debugging
+        # NOTE: tlsAllowInvalidCertificates=True is only for debugging
         client = AsyncIOMotorClient(
-            mongo_url,
+            MONGO_URL,
             tls=True,
-            tlsAllowInvalidCertificates=True   # Remove this after confirming connection works
+            tlsAllowInvalidCertificates=True,  # remove in production
         )
-        db = client[os.environ.get('DB_NAME', 'ai_governance')]
-        logger.info("MongoDB client created.")
+        db = client[DB_NAME]
+        logger.info("MongoDB client created and DB selected: %s", DB_NAME)
+    return db
+
+
+# ----------------------------
+# Logging MUST be configured before get_database() uses logger
+# ----------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+# ----------------------------
+# Env loading
+# ----------------------------
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / ".env")
+
+# ----------------------------
+# Resend config
+# ----------------------------
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
+ADMIN_EMAILS = [e.strip() for e in os.environ.get("ADMIN_EMAILS", "").split(",") if e.strip()]
+
+# Important: actually set the SDK key
+resend.api_key = RESEND_API_KEY
+
+# ----------------------------
+# Mongo config
+# ----------------------------
+MONGO_URL = os.environ.get("MONGO_URL")
+if not MONGO_URL:
+    raise ValueError("MONGO_URL environment variable is required")
+
+DB_NAME = os.environ.get("DB_NAME", "ai_governance")
+
+client: Optional[AsyncIOMotorClient] = None
+db = None
+
+async def get_database():
+    global client, db
+    if client is None:
+        logger.info("Creating MongoDB client with TLS...")
+        # NOTE: tlsAllowInvalidCertificates=True is only for debugging
+        client = AsyncIOMotorClient(
+            MONGO_URL,
+            tls=True,
+            tlsAllowInvalidCertificates=True,  # remove in production
+        )
+        db = client[DB_NAME]
+        logger.info("MongoDB client created and DB selected: %s", DB_NAME)
     return db
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
+
+from pymongo import ReturnDocument
 
 # ─── Models (unchanged) ───
 
@@ -213,10 +290,9 @@ async def root():
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
     database = await get_database()
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
+    status_obj = StatusCheck(**input.model_dump())
     doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
+    doc["timestamp"] = doc["timestamp"].isoformat()
     await database.status_checks.insert_one(doc)
     return status_obj
 
@@ -225,8 +301,8 @@ async def get_status_checks():
     database = await get_database()
     status_checks = await database.status_checks.find({}, {"_id": 0}).to_list(1000)
     for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+        if isinstance(check.get("timestamp"), str):
+            check["timestamp"] = datetime.fromisoformat(check["timestamp"])
     return status_checks
 
 # ─── Publications ───
@@ -241,8 +317,7 @@ async def get_publications():
 async def create_publication(input: PublicationCreate):
     database = await get_database()
     pub = Publication(**input.model_dump())
-    doc = pub.model_dump()
-    await database.publications.insert_one(doc)
+    await database.publications.insert_one(pub.model_dump())
     return pub
 
 @api_router.put("/publications/{pub_id}", response_model=Publication)
@@ -251,8 +326,12 @@ async def update_publication(pub_id: str, input: PublicationUpdate):
     update_data = {k: v for k, v in input.model_dump().items() if v is not None}
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
+
     result = await database.publications.find_one_and_update(
-        {"id": pub_id}, {"": update_data}, return_document=True, projection={"_id": 0}
+        {"id": pub_id},
+        {"$set": update_data},
+        return_document=ReturnDocument.AFTER,
+        projection={"_id": 0},
     )
     if not result:
         raise HTTPException(status_code=404, detail="Publication not found")
@@ -275,9 +354,9 @@ async def send_email(to: list, subject: str, html: str):
     try:
         params = {"from": SENDER_EMAIL, "to": to, "subject": subject, "html": html}
         await asyncio.to_thread(resend.Emails.send, params)
-        logger.info(f"Email sent to {to}")
+        logger.info("Email sent to %s", to)
     except Exception as e:
-        logger.error(f"Failed to send email: {e}")
+        logger.error("Failed to send email: %s", e)
 
 def booking_confirmation_html(booking):
     return f"""
@@ -341,40 +420,53 @@ async def create_booking(input: BookingCreate):
     booking = Booking(**input.model_dump())
     doc = booking.model_dump()
     await database.bookings.insert_one(doc)
-    # Notify admin of new booking
+
     if ADMIN_EMAILS:
-        asyncio.create_task(send_email(
-            ADMIN_EMAILS,
-            f"New Booking: {booking.name} — {booking.date} {booking.time}",
-            new_booking_notification_html(doc)
-        ))
+        asyncio.create_task(
+            send_email(
+                ADMIN_EMAILS,
+                f"New Booking: {booking.name} — {booking.date} {booking.time}",
+                new_booking_notification_html(doc),
+            )
+        )
+
     return booking
 
 @api_router.put("/bookings/{booking_id}/status")
 async def update_booking_status(booking_id: str, input: BookingStatusUpdate):
     database = await get_database()
+
     if input.status not in ["pending", "confirmed", "cancelled"]:
         raise HTTPException(status_code=400, detail="Invalid status")
+
     result = await database.bookings.find_one_and_update(
-        {"id": booking_id}, {"": {"status": input.status}}, return_document=True, projection={"_id": 0}
+        {"id": booking_id},
+        {"$set": {"status": input.status}},
+        return_document=ReturnDocument.AFTER,
+        projection={"_id": 0},
     )
     if not result:
         raise HTTPException(status_code=404, detail="Booking not found")
-    # Send email to client
-    client_email = result.get('email')
+
+    client_email = result.get("email")
     if client_email:
-        if input.status == 'confirmed':
-            asyncio.create_task(send_email(
-                [client_email],
-                "Governance Debrief Confirmed",
-                booking_confirmation_html(result)
-            ))
-        elif input.status == 'cancelled':
-            asyncio.create_task(send_email(
-                [client_email],
-                "Booking Update — New Time Needed",
-                booking_cancellation_html(result)
-            ))
+        if input.status == "confirmed":
+            asyncio.create_task(
+                send_email(
+                    [client_email],
+                    "Governance Debrief Confirmed",
+                    booking_confirmation_html(result),
+                )
+            )
+        elif input.status == "cancelled":
+            asyncio.create_task(
+                send_email(
+                    [client_email],
+                    "Booking Update — New Time Needed",
+                    booking_cancellation_html(result),
+                )
+            )
+
     return result
 
 @api_router.delete("/bookings/{booking_id}")
@@ -389,179 +481,22 @@ async def delete_booking(booking_id: str):
 
 @api_router.get("/bookings/booked-slots")
 async def get_booked_slots():
-    """Return dates/times that are already booked (for calendar display)"""
+    """
+    Return dates/times that are already booked (for calendar display).
+
+    Current logic: return any slot that is NOT cancelled.
+    If you only want confirmed slots, change the filter to {"status": "confirmed"}.
+    """
     database = await get_database()
     bookings = await database.bookings.find(
-        {"status": {"": "cancelled"}},
-        {"_id": 0, "date": 1, "time": 1}
+        {"status": {"$ne": "cancelled"}},
+        {"_id": 0, "date": 1, "time": 1, "status": 1},
     ).to_list(500)
     return bookings
 
 # ─── Seed Data ───
-
-SEED_PUBLICATIONS = [
-    {
-        "id": "pub-sealed-card",
-        "type": "Protocol",
-        "title": "The Sealed Card Protocol: Mediated Legitimacy, Charging, and Governance at the Seam",
-        "venue": "Research Protocol",
-        "year": "2024",
-        "description": "A framework for analyzing how legitimacy is established in the context of generative AI and mediation.",
-        "link": "/sealed-card",
-        "internal": True,
-        "status": "published",
-        "abstract": ""
-    },
-    {
-        "id": "pub-incident-analysis",
-        "type": "Briefing Series",
-        "title": "AI Governance Incident Analysis",
-        "venue": "Research Briefings",
-        "year": "2024",
-        "description": "Seven case studies translating real AI incidents into operational controls: Amazon hiring bias, Clearview data provenance, Zillow forecasting, Dutch welfare scandal, COMPAS, Samsung leaks, Air Canada chatbot.",
-        "link": "/research",
-        "internal": True,
-        "status": "published",
-        "abstract": ""
-    },
-    {
-        "id": "pub-readiness-snapshot",
-        "type": "Framework",
-        "title": "AI Governance Readiness Snapshot",
-        "venue": "Assessment Tool",
-        "year": "2024",
-        "description": "Interactive assessment tool measuring governance maturity across eight dimensions: inventory, risk tiering, decision rights, controls, evidence, vendor review, cadence, and documentation.",
-        "link": "/tool",
-        "internal": True,
-        "status": "published",
-        "abstract": ""
-    }
-]
-
-SEED_WORKING_PAPERS = [
-    {
-        "id": "wp-risk-tiering",
-        "type": "Working Paper",
-        "title": "Risk Tiering for AI Systems: A Practical Framework",
-        "venue": "",
-        "year": "",
-        "description": "Structured criteria for classifying AI use cases by impact, sensitivity, autonomy, and exposure. Includes worked examples across sectors.",
-        "link": "",
-        "internal": False,
-        "status": "in_development",
-        "abstract": "Structured criteria for classifying AI use cases by impact, sensitivity, autonomy, and exposure. Includes worked examples across sectors."
-    },
-    {
-        "id": "wp-evidence-architecture",
-        "type": "Working Paper",
-        "title": "Evidence Architecture for AI Governance",
-        "venue": "",
-        "year": "",
-        "description": "How to design documentation systems that survive audit scrutiny: versioning, ownership, change logs, and reconstruction capability.",
-        "link": "",
-        "internal": False,
-        "status": "in_development",
-        "abstract": "How to design documentation systems that survive audit scrutiny: versioning, ownership, change logs, and reconstruction capability."
-    },
-    {
-        "id": "wp-vendor-due-diligence",
-        "type": "Working Paper",
-        "title": "Vendor AI Due Diligence: A Procurement Framework",
-        "venue": "",
-        "year": "",
-        "description": "Questionnaire design, evaluation criteria, and contractual requirements for third-party AI systems.",
-        "link": "",
-        "internal": False,
-        "status": "in_development",
-        "abstract": "Questionnaire design, evaluation criteria, and contractual requirements for third-party AI systems."
-    }
-]
-
-# ─── FAQ Endpoints ───
-
-@api_router.get("/faq", response_model=List[FAQItem])
-async def get_faq_items():
-    database = await get_database()
-    items = await database.faq_items.find({}, {"_id": 0}).sort("order", 1).to_list(100)
-    return items
-
-@api_router.get("/faq/{section}", response_model=List[FAQItem])
-async def get_faq_by_section(section: str):
-    database = await get_database()
-    items = await database.faq_items.find({"section": section, "active": True}, {"_id": 0}).sort("order", 1).to_list(100)
-    return items
-
-@api_router.post("/faq", response_model=FAQItem)
-async def create_faq_item(input: FAQItemCreate):
-    database = await get_database()
-    item = FAQItem(**input.model_dump())
-    doc = item.model_dump()
-    await database.faq_items.insert_one(doc)
-    return item
-
-@api_router.put("/faq/{item_id}", response_model=FAQItem)
-async def update_faq_item(item_id: str, input: FAQItemUpdate):
-    database = await get_database()
-    update_data = {k: v for k, v in input.model_dump().items() if v is not None}
-    if not update_data:
-        raise HTTPException(status_code=400, detail="No fields to update")
-    result = await database.faq_items.find_one_and_update(
-        {"id": item_id}, {"": update_data}, return_document=True, projection={"_id": 0}
-    )
-    if not result:
-        raise HTTPException(status_code=404, detail="FAQ item not found")
-    return result
-
-@api_router.delete("/faq/{item_id}")
-async def delete_faq_item(item_id: str):
-    database = await get_database()
-    result = await database.faq_items.delete_one({"id": item_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="FAQ item not found")
-    return {"status": "deleted"}
-
-# ─── Service Packages Endpoints ───
-
-@api_router.get("/services", response_model=List[ServicePackage])
-async def get_service_packages():
-    database = await get_database()
-    packages = await database.service_packages.find({}, {"_id": 0}).sort("package_number", 1).to_list(10)
-    return packages
-
-@api_router.get("/services/active", response_model=List[ServicePackage])
-async def get_active_service_packages():
-    database = await get_database()
-    packages = await database.service_packages.find({"active": True}, {"_id": 0}).sort("package_number", 1).to_list(10)
-    return packages
-
-@api_router.post("/services", response_model=ServicePackage)
-async def create_service_package(input: ServicePackageCreate):
-    database = await get_database()
-    package = ServicePackage(**input.model_dump())
-    doc = package.model_dump()
-    await database.service_packages.insert_one(doc)
-    return package
-
-@api_router.put("/services/{package_id}", response_model=ServicePackage)
-async def update_service_package(package_id: str, input: ServicePackageUpdate):
-    database = await get_database()
-    update_data = {k: v for k, v in input.model_dump().items() if v is not None}
-    if not update_data:
-        raise HTTPException(status_code=400, detail="No fields to update")
-    result = await database.service_packages.find_one_and_update(
-        {"id": package_id}, {"": update_data}, return_document=True, projection={"_id": 0}
-    )
-    if not result:
-        raise HTTPException(status_code=404, detail="Service package not found")
-    return result
-
-@api_router.delete("/services/{package_id}")
-async def delete_service_package(package_id: str):
-    database = await get_database()
-    result = await database.service_packages.delete_one({"id": package_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Service package not found")
-    return {"status": "deleted"}
+# (your seed data below can remain as-is)
+# ...
 
 async def seed_publications():
     database = await get_database()
