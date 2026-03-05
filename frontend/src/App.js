@@ -72,6 +72,7 @@ const Navigation = () => {
 
   const navLinks = [
     { path: "/", label: "Home" },
+    { path: "/about", label: "About" },
     { path: "/services", label: "Services" },
     { path: "/portfolio", label: "Portfolio" },
     { path: "/publications", label: "Publications" },
@@ -329,41 +330,71 @@ const Home = () => {
       {/* Agentic Governance */}
       <section className="py-20 lg:py-32 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
-              <p className="text-violet-400 font-mono text-sm mb-4 tracking-wide">CURRENT PERSPECTIVE</p>
-              <h2 className="font-heading font-black text-3xl lg:text-4xl mb-6">Agentic AI Changes Everything</h2>
-              <p className="text-slate-300 leading-relaxed mb-6">
-                Agentic AI turns autonomy into a governance problem because the system does not only generate outputs—it initiates action under delegated authority.
-              </p>
-              <p className="text-slate-300 leading-relaxed">
-                The center of gravity shifts from "is the model accurate" to "what is the system allowed to do, in whose name, with what permissions, and with what proof."
-              </p>
+              <p className="text-violet-400 font-mono text-sm mb-4 tracking-wide">AGENTIC GOVERNANCE</p>
+              <h2 className="font-heading font-black text-3xl lg:text-4xl mb-6">The Governance Object Has Changed</h2>
+              <div className="space-y-4 text-slate-300 leading-relaxed">
+                <p>
+                  Agentic AI changes the governance object. The problem is no longer "a model that predicts." The problem is "a system that acts": it plans, routes tasks, calls tools, writes to systems, and produces outcomes that can materially affect people, operations, and reputation.
+                </p>
+                <p>
+                  Hallucinations still matter, but delegated authority becomes the dominant risk surface.
+                </p>
+                <p>
+                  Agentic governance starts by making agency legible. You define what the agent can do, what it can touch, and what it must never do without explicit approval. You then bind those limits to controls that actually execute in the stack, not just on paper.
+                </p>
+              </div>
             </div>
             <div className="bg-slate-800 p-8">
-              <h3 className="font-heading font-bold text-lg mb-4">A governed agent is defined by:</h3>
-              <ul className="space-y-3 text-slate-300">
+              <h3 className="font-heading font-bold text-lg mb-6">Practical Agentic Governance Baseline</h3>
+              <ul className="space-y-4 text-slate-300">
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span>Explicit tool permissions</span>
+                  <div>
+                    <span className="text-white font-medium">Agency boundaries</span>
+                    <p className="text-sm mt-1">Allowed actions, prohibited actions, and escalation thresholds.</p>
+                  </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span>Material-decision gates</span>
+                  <div>
+                    <span className="text-white font-medium">Tool permissions</span>
+                    <p className="text-sm mt-1">Which tools can be called, under which conditions, with which scopes.</p>
+                  </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span>Replayable logs</span>
+                  <div>
+                    <span className="text-white font-medium">Data rights</span>
+                    <p className="text-sm mt-1">Read and write permissions, retention, and redaction rules.</p>
+                  </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span>Tested containment</span>
+                  <div>
+                    <span className="text-white font-medium">Material decision gates</span>
+                    <p className="text-sm mt-1">What requires a human, what can run autonomously, and how overrides work.</p>
+                  </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span>Escalation paths that trigger consequences</span>
+                  <div>
+                    <span className="text-white font-medium">Evidence and replayability</span>
+                    <p className="text-sm mt-1">Logs that support investigation, audit, and post-incident accountability.</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-white font-medium">Stop mechanisms</span>
+                    <p className="text-sm mt-1">Rate limits, circuit breakers, and a kill switch with named owners.</p>
+                  </div>
                 </li>
               </ul>
+              <p className="mt-6 pt-6 border-t border-slate-700 text-slate-400 text-sm">
+                The goal is simple: delegated action must remain reviewable, bounded, and defensible, especially when the system operates at speed.
+              </p>
             </div>
           </div>
         </div>
@@ -387,8 +418,132 @@ const Home = () => {
   );
 };
 
+// About Page
+const About = () => {
+  return (
+    <div className="min-h-screen pt-20">
+      {/* Hero */}
+      <section className="py-20 lg:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-3 gap-12 items-start">
+            <div className="lg:col-span-2">
+              <p className="text-violet-900 font-mono text-sm mb-4 tracking-wide">ABOUT</p>
+              <h1 className="font-heading font-black text-4xl lg:text-5xl text-slate-900 mb-8">
+                Martin Lepage, PhD
+              </h1>
+              <div className="prose prose-lg max-w-none text-slate-600 leading-relaxed space-y-6">
+                <p>
+                  I build inspection-ready AI governance by embedding constraint design into real workflow gates, so evidence stays legible and decisions hold under scrutiny.
+                </p>
+                <p>
+                  Most organizations have capable leaders and legal awareness, but they lack an executable language that converts intent into controls, controls into proof, and proof into defensible outcomes across the AI lifecycle.
+                </p>
+                <p>
+                  My work focuses on the operational layer where risk tiering, safeguards, approvals, and monitoring triggers become enforceable, reviewable, and repeatable.
+                </p>
+                <p>
+                  I treat AI systems as socio-technical infrastructure: models plus data, tools, interfaces, permissions, branding claims, and institutional accountability.
+                </p>
+                <p>
+                  The result is governance with teeth, not compliance theater: clear boundaries, defined authority, auditable evidence trails, and incident-ready response pathways.
+                </p>
+                <p className="text-slate-900 font-medium">
+                  AurorAI and CompassAI support this work by standardizing intake, control selection, evidence mapping, and decision records across teams.
+                </p>
+              </div>
+            </div>
+            <div className="lg:col-span-1">
+              <div className="sticky top-32 space-y-6">
+                <div className="card">
+                  <h3 className="font-heading font-bold text-lg mb-4">Connect</h3>
+                  <div className="space-y-3">
+                    <a href="https://www.linkedin.com/in/martin-lepage-ai/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-slate-600 hover:text-violet-900 transition-colors">
+                      <Linkedin className="w-5 h-5" />
+                      <span>LinkedIn</span>
+                    </a>
+                    <a href="https://github.com/martinlepage26-bit" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-slate-600 hover:text-violet-900 transition-colors">
+                      <Github className="w-5 h-5" />
+                      <span>GitHub</span>
+                    </a>
+                    <a href="mailto:Consult@govern-ai.ca" className="flex items-center gap-3 text-slate-600 hover:text-violet-900 transition-colors">
+                      <Mail className="w-5 h-5" />
+                      <span>Consult@govern-ai.ca</span>
+                    </a>
+                  </div>
+                </div>
+                <div className="card bg-slate-900 text-white">
+                  <h3 className="font-heading font-bold text-lg mb-3">Frameworks</h3>
+                  <div className="space-y-3">
+                    <a href="https://github.com/martinlepage26-bit/AurorAI" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
+                      <Activity className="w-5 h-5" />
+                      <div>
+                        <span className="block font-medium text-white">AurorAI</span>
+                        <span className="text-xs">Governs shipping</span>
+                      </div>
+                    </a>
+                    <a href="https://github.com/martinlepage26-bit/CompassAI" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
+                      <Compass className="w-5 h-5" />
+                      <div>
+                        <span className="block font-medium text-white">CompassAI</span>
+                        <span className="text-xs">Governs delegated agency</span>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
 // Services Page
 const Services = () => {
+  const services = [
+    {
+      title: "Governance Assessment and Roadmap",
+      description: "Rapid diagnostic of current AI use, gaps, and the shortest path to audit-grade governance.",
+      icon: ClipboardCheck
+    },
+    {
+      title: "AI System Inventory and Boundary Mapping",
+      description: "What exists, where it runs, what it touches, who it affects, and where authority actually sits.",
+      icon: FileText
+    },
+    {
+      title: "Risk Tiering and Control Design",
+      description: "Risk classification aligned to your context, then safeguards that bind to real build and release steps.",
+      icon: AlertTriangle
+    },
+    {
+      title: "Workflow Gates and Approval Mechanisms",
+      description: "Pre-deploy, post-deploy, and change gates that require evidence before shipping or scaling.",
+      icon: Shield
+    },
+    {
+      title: "Evidence Architecture and Decision Ledger",
+      description: "What gets logged, retained, reviewed, and replayed so decisions remain defensible under scrutiny.",
+      icon: BookOpen
+    },
+    {
+      title: "Procurement and Vendor Governance Pack",
+      description: "Due diligence questions, contract clauses, control requirements, and acceptance criteria that can be enforced.",
+      icon: Briefcase
+    },
+    {
+      title: "Agentic AI Governance and Tool-Use Controls",
+      description: "Permissions, tool access, human-in-the-loop thresholds, and kill switches for delegated action systems.",
+      icon: Compass
+    },
+    {
+      title: "Incident Readiness and Response Protocols",
+      description: "Detection triggers, escalation paths, rollback authority, communications, and post-incident learning.",
+      icon: Activity
+    }
+  ];
+
   return (
     <div className="min-h-screen pt-20">
       {/* Header */}
@@ -396,16 +551,44 @@ const Services = () => {
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <p className="text-violet-900 font-mono text-sm mb-4 tracking-wide">SERVICES</p>
           <h1 className="font-heading font-black text-4xl lg:text-5xl text-slate-900 mb-6">
-            Productized AI Governance
+            AI Governance Services
           </h1>
           <p className="text-slate-600 text-lg max-w-2xl">
-            Two frameworks. One mission: make AI systems defensible, reconstructable, and accountable.
+            From rapid assessment to full implementation. Governance with teeth, not compliance theater.
           </p>
         </div>
       </section>
 
+      {/* Services Grid */}
+      <section className="py-12 bg-white section-divider">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="grid md:grid-cols-2 gap-6">
+            {services.map((service, i) => (
+              <motion.div
+                key={i}
+                className="card group"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                whileHover={{ y: -4 }}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-slate-100 flex items-center justify-center flex-shrink-0 group-hover:bg-violet-100 transition-colors">
+                    <service.icon className="w-6 h-6 text-slate-600 group-hover:text-violet-900 transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-bold text-lg mb-2">{service.title}</h3>
+                    <p className="text-slate-600">{service.description}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* AurorAI */}
-      <section className="py-20 bg-white section-divider" data-testid="services-aurorai-section">
+      <section className="py-20 section-divider" data-testid="services-aurorai-section">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-12">
             <div>
@@ -450,7 +633,7 @@ const Services = () => {
       </section>
 
       {/* CompassAI */}
-      <section className="py-20 section-divider" data-testid="services-compassai-section">
+      <section className="py-20 bg-white section-divider" data-testid="services-compassai-section">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-12">
             <div className="lg:order-2">
@@ -466,14 +649,19 @@ const Services = () => {
               <p className="text-slate-600 text-lg leading-relaxed mb-8">
                 Built for agentic systems that route tasks, call tools, and act under delegated authority where the primary risk is unauthorized action, not bad text.
               </p>
-              <a 
-                href="https://github.com/martinlepage26-bit/CompassAI" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="btn-secondary"
-              >
-                <Github className="w-4 h-4" /> View on GitHub
-              </a>
+              <div className="flex gap-4">
+                <a 
+                  href="https://github.com/martinlepage26-bit/CompassAI" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="btn-secondary"
+                >
+                  <Github className="w-4 h-4" /> View on GitHub
+                </a>
+                <Link to="/compass" className="btn-primary">
+                  Try CompassAI <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
             <div className="space-y-4 lg:order-1">
               {[
@@ -497,9 +685,9 @@ const Services = () => {
       {/* CTA */}
       <section className="py-20 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 text-center">
-          <h2 className="font-heading font-black text-3xl mb-6">Which framework fits your needs?</h2>
+          <h2 className="font-heading font-black text-3xl mb-6">Ready to build defensible AI?</h2>
           <p className="text-slate-300 mb-8 max-w-xl mx-auto">
-            Book a consultation to discuss your AI governance challenges and find the right approach.
+            Start with a governance assessment to identify gaps and the shortest path to audit-readiness.
           </p>
           <Link to="/contact" className="btn-primary bg-white text-slate-900 hover:bg-slate-100">
             Schedule a Call <ArrowRight className="w-4 h-4" />
@@ -1077,6 +1265,7 @@ function App() {
         <Navigation />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/publications" element={<Publications />} />

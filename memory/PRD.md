@@ -20,8 +20,9 @@
 ## Implemented Features (MVP - March 2026)
 
 ### Landing Page
-- [x] **Homepage** - Hero, value proposition, services preview, agentic governance section
-- [x] **Services** - AurorAI (shipping governance) & CompassAI (agentic governance) 
+- [x] **Homepage** - Hero, value proposition, services preview, updated agentic governance section
+- [x] **About** - NEW - Full bio with your professional copy, connect sidebar, frameworks links
+- [x] **Services** - 8 services grid + AurorAI/CompassAI detail sections with "Try CompassAI" CTA
 - [x] **Portfolio** - Mock case studies (Financial Services, Healthcare, E-commerce)
 - [x] **Publications** - Research papers/articles with LinkedIn links
 - [x] **Assessment Tool** - 8-question AI governance assessment with GPT-powered analysis
