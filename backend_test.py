@@ -282,6 +282,107 @@ class GovernAIAPITester:
         
         return successful_steps >= (total_steps - 1)  # Allow 1 failure
 
+    # AurorAI Tests
+    def test_aurora_health(self):
+        """Test AurorAI health endpoint"""
+        success, response = self.run_test("AurorAI Health", "GET", "aurora/health", 200)
+        if success:
+            print(f"   Service: {response.get('service', 'Unknown')}")
+            print(f"   Version: {response.get('version', 'Unknown')}")
+            print(f"   Pipeline: {response.get('pipeline', 'Unknown')}")
+        return success
+
+    def test_aurora_schemas(self):
+        """Test AurorAI schemas endpoint - should return 4 schemas"""
+        success, response = self.run_test("AurorAI Schemas", "GET", "aurora/schemas", 200)
+        if success and isinstance(response, list):
+            print(f"   Found {len(response)} schemas")
+            expected_schemas = 4
+            if len(response) == expected_schemas:
+                print(f"   ✅ Correct number of schemas ({expected_schemas})")
+                for schema in response:
+                    print(f"      - {schema.get('name', 'Unknown')}: {schema.get('document_type', 'Unknown')}")
+            else:
+                print(f"   ❌ Expected {expected_schemas} schemas, found {len(response)}")
+                return False
+        return success
+
+    def test_aurora_dashboard_stats(self):
+        """Test AurorAI dashboard stats"""
+        success, response = self.run_test("AurorAI Dashboard Stats", "GET", "aurora/dashboard/stats", 200)
+        if success:
+            print(f"   Total documents: {response.get('total_documents', 0)}")
+            print(f"   Pending reviews: {response.get('pending_reviews', 0)}")
+            print(f"   Schemas count: {response.get('schemas_count', 0)}")
+            print(f"   Pipeline version: {response.get('pipeline_version', 'Unknown')}")
+        return success
+
+    def test_governance_stats_combined(self):
+        """Test governance stats endpoint with combined CompassAI + AurorAI data"""
+        success, response = self.run_test("Governance Stats (Combined)", "GET", "governance/stats", 200)
+        if success:
+            compass_stats = response.get('compass', {})
+            aurora_stats = response.get('aurora', {})
+            combined_stats = response.get('combined', {})
+            
+            print(f"   CompassAI - Controls cataloged: {compass_stats.get('controls_cataloged', 0)}")
+            print(f"   CompassAI - Active policies: {compass_stats.get('policies_active', 0)}")
+            print(f"   AurorAI - Schemas available: {aurora_stats.get('schemas_available', 0)}")
+            print(f"   Combined - Total governed items: {combined_stats.get('total_governed_items', 0)}")
+            print(f"   Combined - Audit-ready percentage: {combined_stats.get('audit_ready_percentage', 0)}%")
+            
+            # Verify required fields exist
+            required_compass = ['controls_cataloged', 'policies_active', 'risk_tiers']
+            required_aurora = ['schemas_available']
+            required_combined = ['total_governed_items', 'audit_ready_percentage']
+            
+            missing_fields = []
+            for field in required_compass:
+                if field not in compass_stats:
+                    missing_fields.append(f"compass.{field}")
+            for field in required_aurora:
+                if field not in aurora_stats:
+                    missing_fields.append(f"aurora.{field}")
+            for field in required_combined:
+                if field not in combined_stats:
+                    missing_fields.append(f"combined.{field}")
+            
+            if missing_fields:
+                print(f"   ❌ Missing required fields: {missing_fields}")
+                return False
+            else:
+                print(f"   ✅ All required governance stats fields present")
+        
+        return success
+
+    def test_aurora_document_workflow(self):
+        """Test AurorAI document upload and processing workflow"""
+        print(f"\n🔄 Testing AurorAI Document Workflow...")
+        
+        # Note: Document upload requires multipart form data - testing list documents instead
+        print("   📄 Document upload test requires multipart form data - testing list documents instead")
+        
+        # Test list documents (should work even if empty)
+        list_success, list_response = self.run_test("List Documents", "GET", "aurora/documents", 200)
+        
+        if list_success:
+            print(f"   Found {len(list_response)} existing documents")
+            
+            # If there are documents, test one document's details
+            if list_response:
+                doc_id = list_response[0].get('id')
+                detail_success, detail_response = self.run_test(
+                    f"Get Document Details", "GET", f"aurora/documents/{doc_id}", 200
+                )
+                if detail_success:
+                    print(f"      Document ID: {doc_id}")
+                    print(f"      Status: {detail_response.get('status', 'Unknown')}")
+                    print(f"      Filename: {detail_response.get('filename', 'Unknown')}")
+                
+                return detail_success
+        
+        return list_success
+
     def print_summary(self):
         """Print test results summary"""
         print(f"\n{'='*60}")
@@ -315,6 +416,9 @@ def main():
     tester.test_portfolio_endpoint()
     tester.test_publications_endpoint()
     
+    print("\n📋 Testing Combined Governance Stats...")
+    tester.test_governance_stats_combined()
+    
     print("\n📋 Testing Assessment System...")
     tester.test_assessment_questions()
     tester.test_assessment_submission()
@@ -328,6 +432,12 @@ def main():
     tester.test_compass_controls()
     tester.test_compass_policies()
     tester.test_compass_usecases_flow()
+    
+    print("\n📋 Testing AurorAI System...")
+    tester.test_aurora_health()
+    tester.test_aurora_schemas()
+    tester.test_aurora_dashboard_stats()
+    tester.test_aurora_document_workflow()
     
     # Print final results
     all_passed = tester.print_summary()

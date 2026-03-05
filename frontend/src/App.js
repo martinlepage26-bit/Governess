@@ -23,12 +23,89 @@ import {
   BookOpen,
   Briefcase,
   ClipboardCheck,
-  LayoutDashboard
+  LayoutDashboard,
+  TrendingUp
 } from "lucide-react";
 import CompassAIApp from "./CompassAI";
+import AurorAIApp from "./AurorAI";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+
+// Governance Maturity Indicator
+const GovernanceIndicator = () => {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get(`${API}/governance/stats`);
+        setStats(res.data);
+      } catch (e) {
+        console.error("Failed to fetch governance stats", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  if (loading || !stats) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5 }}
+      className="fixed bottom-6 right-6 z-40"
+      data-testid="governance-indicator"
+    >
+      <div className="bg-slate-900 text-white p-4 shadow-xl max-w-xs">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+          <span className="text-xs font-mono text-slate-400">LIVE GOVERNANCE</span>
+        </div>
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-400">Controls cataloged</span>
+            <span className="font-mono font-bold">{stats.compass.controls_cataloged}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-slate-400">Active policies</span>
+            <span className="font-mono font-bold">{stats.compass.policies_active}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-slate-400">Risk tiering</span>
+            <span className="font-mono font-bold text-violet-400">{stats.compass.risk_tiers}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-slate-400">Schemas available</span>
+            <span className="font-mono font-bold">{stats.aurora.schemas_available}</span>
+          </div>
+        </div>
+        {stats.combined.total_governed_items > 0 && (
+          <div className="mt-3 pt-3 border-t border-slate-700">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-400">Items governed</span>
+              <span className="font-mono font-bold text-emerald-400">{stats.combined.total_governed_items}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-slate-400">Audit-ready</span>
+              <span className="font-mono font-bold text-emerald-400">{stats.combined.audit_ready_percentage}%</span>
+            </div>
+          </div>
+        )}
+        <Link 
+          to="/compass" 
+          className="mt-3 flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 transition-colors"
+        >
+          Explore CompassAI <ChevronRight className="w-3 h-3" />
+        </Link>
+      </div>
+    </motion.div>
+  );
+};
 
 // Logo Components
 const NeedleLogo = ({ className = "w-10 h-10", removeBackground = false }) => (
@@ -77,6 +154,7 @@ const Navigation = () => {
     { path: "/portfolio", label: "Portfolio" },
     { path: "/publications", label: "Publications" },
     { path: "/assessment", label: "Assessment" },
+    { path: "/aurora", label: "AurorAI" },
     { path: "/compass", label: "CompassAI" },
     { path: "/contact", label: "Contact" }
   ];
@@ -1094,6 +1172,19 @@ const Assessment = () => {
   );
 };
 
+// AurorAI Page Wrapper
+const AurorAIPage = () => {
+  return (
+    <div className="min-h-screen pt-20">
+      <section className="py-12 lg:py-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <AurorAIApp />
+        </div>
+      </section>
+    </div>
+  );
+};
+
 // CompassAI Page Wrapper
 const CompassAIPage = () => {
   return (
@@ -1270,10 +1361,12 @@ function App() {
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/publications" element={<Publications />} />
           <Route path="/assessment" element={<Assessment />} />
+          <Route path="/aurora" element={<AurorAIPage />} />
           <Route path="/compass" element={<CompassAIPage />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
         <Footer />
+        <GovernanceIndicator />
       </BrowserRouter>
     </div>
   );

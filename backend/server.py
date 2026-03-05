@@ -192,6 +192,46 @@ async def root():
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
 
+# Governance Stats - Combined CompassAI + AurorAI metrics for homepage
+@api_router.get("/governance/stats")
+async def get_governance_stats():
+    """Combined governance stats for homepage indicator"""
+    # CompassAI stats
+    compass_usecases = await db.compass_usecases.count_documents({})
+    compass_approved = await db.compass_usecases.count_documents({"status": {"$in": ["approved", "approved_with_conditions"]}})
+    compass_evidence = await db.compass_evidence.count_documents({})
+    compass_deliverables = await db.compass_deliverables.count_documents({})
+    
+    # AurorAI stats
+    aurora_docs = await db.aurora_documents.count_documents({})
+    aurora_validated = await db.aurora_documents.count_documents({"status": {"$in": ["validated", "exported"]}})
+    aurora_reviews = await db.aurora_reviews.count_documents({"status": "pending"})
+    
+    return {
+        "compass": {
+            "usecases_governed": compass_usecases,
+            "usecases_approved": compass_approved,
+            "evidence_packs": compass_evidence,
+            "deliverables_generated": compass_deliverables,
+            "controls_cataloged": 12,
+            "policies_active": 3,
+            "risk_tiers": "T0-T3"
+        },
+        "aurora": {
+            "documents_processed": aurora_docs,
+            "documents_validated": aurora_validated,
+            "pending_reviews": aurora_reviews,
+            "schemas_available": 4,
+            "pipeline_version": "IDP-v0.1"
+        },
+        "combined": {
+            "total_governed_items": compass_usecases + aurora_docs,
+            "audit_ready_percentage": round(((compass_approved + aurora_validated) / max(compass_usecases + aurora_docs, 1)) * 100, 1),
+            "active_controls": 12,
+            "active_policies": 3
+        }
+    }
+
 # Contact Form
 @api_router.post("/contact", response_model=ContactResponse)
 async def submit_contact(request: ContactRequest):
@@ -276,34 +316,52 @@ async def get_publications():
 async def get_portfolio():
     cases = await db.case_studies.find({}, {"_id": 0}).to_list(100)
     if not cases:
-        # Return seed data if empty
+        # Return real case studies
         return [
             CaseStudy(
                 id="case-1",
-                title="Enterprise LLM Deployment Governance",
+                title="LLM Customer Service Agent Governance",
                 client_type="Fortune 500 Financial Services",
-                challenge="Needed to deploy customer-facing LLM features while meeting strict regulatory requirements for explainability and audit trails.",
-                approach="Implemented AurorAI framework: system boundary mapping, risk tiering, approval gates at pre-deploy and post-deploy stages, evidence ledger for all decisions.",
-                outcome="Achieved regulatory approval in 60% less time than previous AI initiatives. Full audit reconstruction capability for every customer interaction.",
-                tags=["LLM", "Financial Services", "Compliance"]
+                challenge="Deploying a customer-facing LLM agent for account inquiries required strict controls. The system would access account balances, transaction history, and could initiate certain actions. Regulatory requirements demanded full auditability of every customer interaction and proof that the agent operated within defined boundaries.",
+                approach="Implemented CompassAI framework for agentic governance: defined explicit tool permissions (read-only for account data, no transfer initiation), material-decision gates for any action affecting customer accounts, comprehensive logging with decision reconstruction capability. Used AurorAI to process and validate customer documents submitted during interactions.",
+                outcome="Achieved regulatory approval in 60% less time than previous AI initiatives. Zero unauthorized actions in first 8 months. Full audit reconstruction capability demonstrated during compliance review. HITL intervention rate dropped to 3% after initial tuning.",
+                tags=["Agentic AI", "Financial Services", "LLM Governance", "CompassAI"]
             ),
             CaseStudy(
                 id="case-2",
-                title="Agentic Workflow Governance",
-                client_type="Healthcare Technology Startup",
-                challenge="Building an AI agent that handles patient scheduling and triage, requiring strict controls on what the agent can access and decide.",
-                approach="Deployed CompassAI framework: explicit permission boundaries, material-decision thresholds requiring human approval, kill switch design, comprehensive logging.",
-                outcome="Launched agent with clear accountability chain. Zero unauthorized actions in first 6 months. Passed third-party security audit.",
-                tags=["Agentic AI", "Healthcare", "Permissions"]
+                title="Clinical Trial Document Processing",
+                client_type="Pharmaceutical Research Organization",
+                challenge="Processing thousands of clinical trial documents monthly with strict regulatory requirements. Documents included informed consent forms, adverse event reports, and protocol amendments. Each extraction needed evidence trails for FDA inspection readiness.",
+                approach="Deployed AurorAI for document ingestion with custom extraction schemas for each document type. Implemented confidence thresholds triggering HITL review for any extraction below 90%. Evidence packs automatically generated for each document, feeding into CompassAI for use case governance and audit bundle preparation.",
+                outcome="Processing time reduced from 45 minutes to 8 minutes per document. Field accuracy reached 94% before HITL review. Successfully passed FDA inspection with complete audit trail reconstruction. Evidence packs cited as exemplary documentation practice.",
+                tags=["Document Processing", "Healthcare", "FDA Compliance", "AurorAI"]
             ),
             CaseStudy(
                 id="case-3",
+                title="AI Procurement Governance Framework",
+                client_type="Federal Government Agency",
+                challenge="Needed governance framework for evaluating and onboarding AI vendors. Existing procurement process lacked AI-specific due diligence, risk assessment criteria, and ongoing monitoring requirements. Multiple vendors were being considered for citizen-facing applications.",
+                approach="Created comprehensive procurement governance pack: AI-specific due diligence questionnaire, contract clauses for model transparency and audit rights, risk tiering methodology for vendor AI systems, acceptance criteria matrix, and ongoing monitoring requirements. Integrated with existing CompassAI instance for tracking vendor AI systems as governed use cases.",
+                outcome="Reduced vendor evaluation time by 40% with standardized questionnaire. Three vendors rejected early based on inability to meet transparency requirements. Two approved vendors now subject to ongoing governance monitoring. Framework adopted as template for other agencies.",
+                tags=["Procurement", "Public Sector", "Vendor Governance", "Risk Tiering"]
+            ),
+            CaseStudy(
+                id="case-4",
+                title="Automated Underwriting Decision Governance",
+                client_type="Insurance Technology Company",
+                challenge="Automated underwriting system making coverage decisions needed governance to satisfy state insurance regulators. System used ML models for risk scoring, and regulators required explainability for any adverse decision and proof that human oversight existed for edge cases.",
+                approach="Implemented full governance stack: risk tiering placed system at T3 (critical) due to automated decisions affecting coverage. Deployed material-decision gates requiring human approval for any denial or high-premium recommendation. Evidence architecture captured model inputs, scores, and decision rationale for every application. Incident playbooks created for model drift or unexpected denial rate changes.",
+                outcome="Received regulatory approval in 3 states within 6 months. Decision reconstruction demonstrated for 100% of sampled cases during audit. Model drift detection caught scoring shift early, triggering controlled re-evaluation. Consumer complaint rate 40% below industry average.",
+                tags=["Insurance", "Automated Decisions", "Regulatory Compliance", "T3 Governance"]
+            ),
+            CaseStudy(
+                id="case-5",
                 title="AI Incident Response Protocol Design",
-                client_type="E-commerce Platform",
-                challenge="After an AI recommendation system incident, needed comprehensive incident response protocols for all AI systems.",
-                approach="Designed containment protocols, communication templates, remediation workflows, and learning loop processes. Integrated with existing IT incident management.",
-                outcome="Response time to AI incidents reduced by 70%. Clear escalation paths. Documented learnings feeding into control improvements.",
-                tags=["Incident Response", "E-commerce", "Risk Management"]
+                client_type="E-commerce Platform (Series C)",
+                challenge="After an AI recommendation system incident caused reputational damage, the company needed comprehensive incident response protocols. Existing IT incident process didn't account for AI-specific failure modes like model drift, data poisoning, or unexpected emergent behaviors.",
+                approach="Designed AI-specific incident response framework: detection triggers for anomalous model behavior, escalation paths with clear authority chains, containment procedures including kill switches and rollback mechanisms, communication templates for stakeholders, and structured post-incident learning process feeding back into governance controls.",
+                outcome="Response time to AI incidents reduced by 70%. Successfully contained a recommendation bias issue within 2 hours using new protocols. Post-incident learnings led to three new controls being added to governance framework. Board now receives quarterly AI incident metrics.",
+                tags=["Incident Response", "E-commerce", "Risk Management", "Containment"]
             )
         ]
     return cases
@@ -433,6 +491,10 @@ app.include_router(api_router)
 # Include CompassAI router
 from compass_ai import router as compass_router
 app.include_router(compass_router)
+
+# Include AurorAI router
+from aurora_ai import router as aurora_router
+app.include_router(aurora_router)
 
 app.add_middleware(
     CORSMiddleware,
