@@ -22,8 +22,10 @@ import {
   Send,
   BookOpen,
   Briefcase,
-  ClipboardCheck
+  ClipboardCheck,
+  LayoutDashboard
 } from "lucide-react";
+import CompassAIApp from "./CompassAI";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -74,6 +76,7 @@ const Navigation = () => {
     { path: "/portfolio", label: "Portfolio" },
     { path: "/publications", label: "Publications" },
     { path: "/assessment", label: "Assessment" },
+    { path: "/compass", label: "CompassAI" },
     { path: "/contact", label: "Contact" }
   ];
 
@@ -903,6 +906,19 @@ const Assessment = () => {
   );
 };
 
+// CompassAI Page Wrapper
+const CompassAIPage = () => {
+  return (
+    <div className="min-h-screen pt-20">
+      <section className="py-12 lg:py-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <CompassAIApp />
+        </div>
+      </section>
+    </div>
+  );
+};
+
 // Contact Page
 const Contact = () => {
   const [form, setForm] = useState({ name: '', email: '', company: '', message: '' });
@@ -1065,6 +1081,7 @@ function App() {
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/publications" element={<Publications />} />
           <Route path="/assessment" element={<Assessment />} />
+          <Route path="/compass" element={<CompassAIPage />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
         <Footer />

@@ -430,6 +430,10 @@ async def submit_assessment(submission: AssessmentSubmission):
 # Include the router in the main app
 app.include_router(api_router)
 
+# Include CompassAI router
+from compass_ai import router as compass_router
+app.include_router(compass_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
