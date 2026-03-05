@@ -1,0 +1,129 @@
+{
+  "brand_identity": {
+    "name": "Martin Lepage, PhD",
+    "title": "AI Governance Consulting",
+    "mission": "AI governance as decision machinery, not observability theater.",
+    "archetype": "The Architect's Light",
+    "visual_metaphor": "Blueprints, Precision Machinery, Clean Lines, Deep Depth"
+  },
+  "typography": {
+    "headings": {
+      "family": "Chivo, sans-serif",
+      "weights": ["300", "400", "900"],
+      "usage": "Use Weight 900 for Hero Headlines to feel 'Heavy'. Use 300 for elegant subheaders.",
+      "letter_spacing": "tracking-tight"
+    },
+    "body": {
+      "family": "Inter, sans-serif",
+      "weights": ["400", "500"],
+      "usage": "High legibility, neutral voice."
+    },
+    "mono": {
+      "family": "JetBrains Mono, monospace",
+      "usage": "For 'Data', 'Metrics', 'Governance Controls', and 'Repo Links'."
+    }
+  },
+  "colors": {
+    "background": {
+      "default": "#F8FAFC",
+      "paper": "#FFFFFF",
+      "subtle": "#F1F5F9"
+    },
+    "text": {
+      "primary": "#020617",
+      "secondary": "#475569",
+      "muted": "#94A3B8"
+    },
+    "accents": {
+      "primary_navy": "#0F172A",
+      "deep_purple": "#4C1D95",
+      "royal_violet": "#581C87",
+      "tech_blue": "#0EA5E9"
+    },
+    "feedback": {
+      "success": "#10B981",
+      "error": "#EF4444",
+      "warning": "#F59E0B"
+    },
+    "gradients": {
+      "aurora": "bg-gradient-to-r from-violet-900 via-indigo-900 to-slate-900",
+      "subtle_mesh": "bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-100 via-slate-50 to-white"
+    }
+  },
+  "layout_strategy": {
+    "grid_system": "The Blueprint Grid",
+    "container_padding": "p-6 md:p-12 lg:p-24",
+    "rules": [
+      "No center-aligned hero text. Left align for 'Documentation' feel.",
+      "Use visible 1px grid lines (slate-200) to separate sections.",
+      "Generous whitespace: Section gaps should be min h-32.",
+      "Asymmetry: 2/3 text, 1/3 visual."
+    ]
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-slate-900 text-white hover:bg-slate-800 rounded-none h-12 px-8 uppercase tracking-widest text-xs font-bold shadow-lg transition-transform hover:-translate-y-1",
+      "secondary": "bg-white text-slate-900 border border-slate-200 hover:border-slate-900 rounded-none h-12 px-8 uppercase tracking-widest text-xs font-bold"
+    },
+    "cards": {
+      "style": "bg-white border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-sm p-8 hover:border-violet-900/30 transition-colors duration-300",
+      "glass": "bg-white/80 backdrop-blur-md border border-white/40 shadow-sm"
+    },
+    "inputs": {
+      "style": "bg-slate-50 border-b-2 border-slate-200 focus:border-violet-900 rounded-none px-4 py-3 outline-none transition-colors placeholder:text-slate-400"
+    },
+    "navigation": {
+      "style": "Fixed top, glassmorphism (white/90), 1px bottom border (slate-100). Logo left, Links right."
+    }
+  },
+  "visual_enhancers": {
+    "textures": [
+      "Subtle noise overlay (opacity 0.02) on all backgrounds.",
+      "Grid patterns in Hero and Footer."
+    ],
+    "motion": {
+      "hover": "translate-x-1 duration-200",
+      "entrance": "staggered fade-in-up",
+      "scroll": "Parallax on abstract shapes"
+    },
+    "icons": "Lucide React (Stroke width 1.5px, sharp). Use 'Compass' for CompassAI, 'Activity' for AurorAI."
+  },
+  "media": {
+    "image_style": "Black and white or desaturated imagery with a single 'Tint' of Navy or Purple overlay. No full-color stock photos.",
+    "assets": [
+      {
+        "category": "Hero Background",
+        "url": "https://images.unsplash.com/photo-1743778812446-89def1e784cf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMGdlb21ldHJpYyUyMGxpbmVzJTIwYmx1ZXByaW50JTIwd2hpdGUlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc3MjY3MjcyM3ww&ixlib=rb-4.1.0&q=85",
+        "description": "Architectural Blueprint Lines - Set as background with low opacity (10-20%)"
+      },
+      {
+        "category": "Contact/About",
+        "url": "https://images.unsplash.com/photo-1765371514743-45bd8e6c0a28?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTV8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwb2ZmaWNlJTIwbWVldGluZyUyMHByb2Zlc3Npb25hbCUyMHdoaXRlJTIwYWVzdGhldGljfGVufDB8fHx8MTc3MjY3MjcyNHww&ixlib=rb-4.1.0&q=85",
+        "description": "Clean minimal office - Use for About/Contact section (Desaturate via CSS)"
+      }
+    ]
+  },
+  "page_specifics": {
+    "landing": {
+      "hero": "Headline: 'Governance as Decision Machinery'. Sub: 'Martin Lepage, PhD'. CTA: 'Assess Your Governance'. Background: Blueprint Grid.",
+      "services": "Two distinct cards: 'AurorAI' (Shipping Systems) and 'CompassAI' (Agentic Governance). Use Bento Grid layout."
+    },
+    "assessment_tool": {
+      "style": "Wizard Step Form. Clean, distraction-free. Progress bar top. Question big in center. Options as large clickable cards.",
+      "colors": "Use Violet-900 for active state."
+    },
+    "portfolio": {
+      "style": "Masonry grid of Case Studies. Each card looks like a 'File Folder' or 'Technical Report'."
+    }
+  },
+  "instructions_to_main_agent": [
+    "INSTALL: npm install lucide-react framer-motion clsx tailwind-merge @radix-ui/react-slot --legacy-peer-deps",
+    "THEME: Force Light Mode. Do not implement a dark mode toggle unless requested later. The brand is 'Airy/Professional'.",
+    "LOGOS: If logo files are missing, build them with Lucide Icons: Compass = <Compass className='w-8 h-8 text-violet-900' />, Monogram = <div className='font-bold text-xl tracking-tighter border-2 border-slate-900 p-1'>ML</div>",
+    "TESTING: Add data-testid to all buttons, links, and inputs."
+  ],
+  "accessibility": {
+    "contrast": "Ensure Slate-500 text is only used on White. Use Slate-900 for all critical reading.",
+    "focus": "Focus ring must be Violet-900 offset-2."
+  }
+}
