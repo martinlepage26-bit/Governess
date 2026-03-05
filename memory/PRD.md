@@ -24,18 +24,30 @@
 - [x] **About** - Full bio with professional copy, connect sidebar, frameworks links
 - [x] **Services** - 8 services grid + AurorAI/CompassAI detail sections
 - [x] **Portfolio** - 5 real case studies (LLM Governance, Clinical Trials, Procurement, Underwriting, Incident Response)
-- [x] **Publications** - Research papers/articles with LinkedIn links
+- [x] **Publications/Blog** - Full blog with CRUD, tag filtering, full article view (NEW - March 2026)
 - [x] **Assessment Tool** - 8-question AI governance assessment with GPT-powered analysis
 - [x] **Contact** - Email form (Resend) + Calendly booking widget
 
-### Authentication System (NEW)
+### Publications/Blog Section (NEW - March 2026)
+- [x] **Publication List** - Display articles with date, title, abstract, and tags
+- [x] **Tag Filtering** - Filter publications by clicking tags
+- [x] **Full Article View** - Click to read full content with markdown rendering
+- [x] **Admin CRUD** - Admin can create, edit, delete publications
+- [x] **Seed Data** - 3 pre-written articles with full content (Decision Machinery, Agentic Governance, Evidence Artifacts)
+
+### Authentication System
 - [x] **Google OAuth** - Via Emergent Auth, professional single-sign-on
 - [x] **Admin Role** - martinlepage.ai@gmail.com has full access
-- [x] **Client Role** - Requires approval to access CompassAI
+- [x] **Client Role** - Requires approval to access CompassAI/AurorAI
 - [x] **Request Access Page** - Public form for clients to request access
 - [x] **Admin Dashboard** - Approve/reject access requests, manage users
 - [x] **Protected Routes** - AurorAI/CompassAI behind authentication
 - [x] **Session Management** - 7-day sessions with secure cookies
+
+### Multi-Tenancy (Completed - March 2026)
+- [x] **CompassAI** - Full multi-tenant data isolation (clients only see their own use cases)
+- [x] **AurorAI** - Full multi-tenant data isolation (clients only see their own documents)
+- [x] **Admin Bypass** - Admin user sees all data across all tenants
 
 ### CompassAI Governance Engine
 - [x] **Dashboard** - Stats overview (use cases, tiers, approvals, controls, policies)
@@ -46,7 +58,7 @@
 - [x] **Deliverable Generator** - System Cards, Risk Assessments auto-generated
 - [x] **Audit Export** - JSON bundle with evidence index, decisions, signatures
 
-### AurorAI IDP Engine (NEW)
+### AurorAI IDP Engine
 - [x] **Dashboard** - Document processing stats by status and category
 - [x] **Document Upload** - Drag-and-drop with multi-format support (PDF, DOC, images)
 - [x] **Classification** - Auto-classify documents by category (financial, legal, HR, etc.) and type
@@ -69,18 +81,29 @@
 - **APIs:** Resend, Calendly embed, OpenAI via Emergent
 
 ## P1 Backlog (Next)
-- [ ] Admin dashboard for managing publications/case studies
+- [ ] LinkedIn API Integration - Auto-post blog articles to LinkedIn
 - [ ] Evidence ingestion API for AurorAI → CompassAI flow
 - [ ] Approval workflow with digital signatures
-- [ ] Monitoring engine for drift/violations
+- [ ] Email notifications for access request workflow (approval/rejection emails)
 - [ ] Document processing webhooks (document.uploaded, document.extracted, etc.)
 
 ## P2 Backlog
+- [ ] Dynamic case study management (admin CRUD for portfolio)
 - [ ] Dark mode toggle
 - [ ] Multi-language support (EN/FR)
 - [ ] Jira/ServiceNow integration for gap tickets
 - [ ] Executive dashboards
 - [ ] DMS connectors (SharePoint, Box)
+
+## Publications API Reference
+```
+GET  /api/publications - List publications (optional: ?tag=X to filter)
+GET  /api/publications/{id} - Get single publication with full content
+GET  /api/publications/tags/all - Get all unique tags
+POST /api/publications - Create publication (admin only)
+PUT  /api/publications/{id} - Update publication (admin only)
+DELETE /api/publications/{id} - Delete publication (admin only)
+```
 
 ## AurorAI API Reference
 ```

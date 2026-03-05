@@ -1055,12 +1055,22 @@ const Publications = () => {
               {selectedPub.content ? (
                 <div className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-p:text-slate-600 prose-li:text-slate-600 prose-a:text-violet-900">
                   {selectedPub.content.split('\n').map((line, i) => {
-                    if (line.startsWith('# ')) return <h1 key={i} className="text-2xl font-bold mt-8 mb-4">{line.slice(2)}</h1>;
-                    if (line.startsWith('## ')) return <h2 key={i} className="text-xl font-bold mt-6 mb-3">{line.slice(3)}</h2>;
-                    if (line.startsWith('- ')) return <li key={i} className="ml-6 mb-2">{line.slice(2)}</li>;
-                    if (line.startsWith('**') && line.endsWith('**')) return <p key={i} className="font-bold mb-2">{line.slice(2, -2)}</p>;
+                    // Helper to render inline bold text
+                    const renderInlineBold = (text) => {
+                      const parts = text.split(/(\*\*[^*]+\*\*)/g);
+                      return parts.map((part, idx) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={idx}>{part.slice(2, -2)}</strong>;
+                        }
+                        return part;
+                      });
+                    };
+                    
+                    if (line.startsWith('# ')) return <h1 key={i} className="text-2xl font-bold mt-8 mb-4">{renderInlineBold(line.slice(2))}</h1>;
+                    if (line.startsWith('## ')) return <h2 key={i} className="text-xl font-bold mt-6 mb-3">{renderInlineBold(line.slice(3))}</h2>;
+                    if (line.startsWith('- ')) return <li key={i} className="ml-6 mb-2">{renderInlineBold(line.slice(2))}</li>;
                     if (line.trim() === '') return <br key={i} />;
-                    return <p key={i} className="mb-4">{line}</p>;
+                    return <p key={i} className="mb-4">{renderInlineBold(line)}</p>;
                   })}
                 </div>
               ) : (
