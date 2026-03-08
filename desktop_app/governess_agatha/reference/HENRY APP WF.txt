@@ -1,0 +1,396 @@
+HENRY APP
+
+# HENRY Inspectable Workflow
+
+Purpose: produce a social sciences / humanities manuscript whose **pathway is reconstructible**. The app treats the workflow itself as an accountability object: phases, artifacts, gates, loops, and consequence checks.
+
+## 0) Core objects the app manages
+
+**Paper Project**
+
+* `PROJECT_ID`
+* `TITLE_WORKING`
+* `VOICE_SPEC_ID` (HENRY Voice Spec v1)
+* `TERM_LOCK_SET` (glitch, charging, seam, pathway_authorization)
+* `HOURGLASS_SCAFFOLD` (broad to narrow to broad)
+* `RISK_REGISTER`
+
+**Section**
+
+* `SECTION_ID`
+* `SECTION_NAME` (Front matter, Background, Lit Review, Conceptual, Methods, Analysis, Discussion, Conclusion)
+* `SECTION_FUNCTION` (what this section does in the argument)
+* `VERSION_STACK` (v1, v2, v3)
+* `GATES_PASSED`
+* `VERIFICATION_STATUS`
+
+**Inspectability Packet**
+
+* Appendix A artifacts (version stack table, prompt log, decision register, coupling checklist, cadence note)
+* Appendix B diagram (phase map + loops)
+
+---
+
+# PHASED WORKFLOW (the app’s canonical pipeline)
+
+## PHASE 0: LOCK
+
+**Inputs**
+
+* `HOURGLASS_SCAFFOLD`
+* `TERM_LOCK_SET`
+* `VOICE_SPEC` (constraints, leak points, “protect at all costs”)
+* `STYLE_CONSTRAINTS` (no em dashes, no decorative separators, avoid starting sentences with “And”)
+
+**Artifacts**
+
+* `OUTLINE_V0`
+* `GLOSSARY_V0` (term-lock definitions)
+* `RISK_REGISTER_V0`
+
+**Gate: Vocabulary Freeze**
+
+* Condition: `TERM_LOCK_SET` defined + `GLOSSARY_V0` saved
+* Rule: no drift without a logged rationale in `DECISION_REGISTER`
+
+---
+
+## PHASE 1: SPINE DRAFT (section order enforced)
+
+Order is fixed unless a decision entry authorizes a deviation:
+
+1. Background and Context
+2. Literature Review
+3. Conceptual Framework
+4. Methods and Materials
+5. Analysis and Results
+6. Discussion
+7. Conclusion
+8. Front matter (Title, Abstract, Introduction) drafted late
+
+**Artifacts**
+
+* `SECTION_DRAFT_V1` for each section
+
+**Gate after each section: Go / No-Go**
+
+* Condition: section has a declared `SECTION_FUNCTION` + minimum internal coherence pass
+* App action: requires a gate event, for example `GATE_EVENT: GO_BACKGROUND`
+
+---
+
+## PHASE 2: THREE-ARM COUPLING
+
+The app treats coupling as a structural test, not a rhetorical flourish.
+
+**Arms**
+
+* Academic arm: genre compliance + audit trail
+* Artistic arm: Wheels of Will + HEXA anchors
+* Ritual arm: proof regime collision and translation of evidence across regimes
+
+**Artifacts**
+
+* `COUPLING_CHECKLIST`
+* `ANCHOR_INVENTORY` (where each mechanism is anchored in each arm)
+
+**Gate: Mechanism Anchoring**
+
+* Condition: each core mechanism has an anchor in each arm, or the checklist explicitly marks “Partial” with a repair task.
+
+Core mechanisms (app defaults, editable):
+
+* glitch_as_seam_event
+* charging_as_credibility_allocation
+* pathway_authorization
+* proof_regime_collision
+* platform_condition_optimization_double_bind
+* disability_and_legitimacy_policing
+
+---
+
+## PHASE 3: TRANSFORMATION PASSES (documented, constraint-aware)
+
+Transformation passes are allowed only if logged.
+
+Default pass set (editable):
+
+* `STAY_CLOSE_PASS`
+* `SIGNPOSTING_PASS`
+* `REFERENCE_CHECK_PASS`
+* `FORMAT_PASS` (includes style constraints)
+* Optional: `COHERENCE_PASS`, `COUPLING_INJECTION_PASS`
+
+**Artifacts**
+
+* `PROMPT_LOG`
+* `DECISION_REGISTER`
+
+**Gate: No Unlogged Transformations**
+
+* Condition: every v2 output references a prompt-log entry or an explicit manual edit log entry.
+
+---
+
+## PHASE 4: VERIFY + CONSEQUENCE CHECK
+
+This phase is where the app forces auditability.
+
+**Verification instruments**
+
+* `CITATION_TO_CLAIM_MAP`
+* `TERM_LOCK_SWEEP`
+* `RISK_SCAN` for:
+
+  * over-polish (voice laundering)
+  * unstable citations
+  * generic template tone
+  * purity policing drift
+  * conceptual drift under synonym pressure
+
+**Artifacts**
+
+* `VERIFICATION_LEDGER`
+* `RISK_REGISTER_UPDATED`
+
+**Gate: Claims Checkable, Pathway Reconstructible**
+
+* Condition: claims have traceable support, vocabulary is stable, pathway logs are complete.
+
+---
+
+## PHASE 5: CADENCE (READ LOUD) AS A GOVERNANCE CONTROL
+
+Cadence is not “stylistic cleanup.” It is a circulation-risk control.
+
+**Allowed micro-edits only**
+
+* split breathless clause stacks
+* add one anchor sentence when abstraction spikes
+* move knife sentence earlier when claim arrives late
+* rewrite lines that sound optimized or generic under audio
+* standardize punctuation to plain forms, remove em dashes
+* tighten transitions by naming section and paragraph function
+
+**Artifacts**
+
+* `CADENCE_NOTE`
+* `EDIT_LIST`
+
+**Gate: Low-friction audio flow without generic smoothing**
+
+* Condition: cadence fixes improve tractability without sanding off texture.
+
+---
+
+## PHASE 6: MERGE + RELEASE
+
+**Artifacts**
+
+* `MERGED_MANUSCRIPT_V3`
+* `APPENDIX_A_INSPECTABLE_PACKET`
+* `APPENDIX_B_ONE_PAGE_DIAGRAM`
+
+**Output set**
+
+* Manuscript
+* Inspectability bundle
+* Optional export: “Audit zip” containing all logs and version lineage
+
+---
+
+# LOOPS (triggered repairs)
+
+The app runs loops as needed, each producing a logged repair trail.
+
+* `L1_TERM_DRIFT`: detect drift -> revise -> re-sweep
+* `L2_COUPLING_WEAKNESS`: weak arm -> add anchor -> re-check
+* `L3_SUSPICION_SEAM_TRIGGER`: detect seam trigger -> add pathway evidence -> re-test
+* `L4_CITATION_INSTABILITY`: unstable cite -> replace or lock -> re-map
+
+---
+
+# APPENDIX A (generated by the app)
+
+## A1. Section version stack (v1, v2, v3)
+
+App renders a table per section:
+
+**Fields**
+
+* `SECTION_NAME`
+* `V1_ARTIFACT_ID`
+* `V2_ARTIFACT_ID`
+* `V3_ARTIFACT_ID`
+* `NOTES_GATES_CONTROLS`
+
+This is where your existing lineage entries live (SEALDCARD-FIRSTDRAFT, SAKURA layers, KEPT OUTPUTs, merged DOCX sections).
+
+---
+
+## A2. Prompt and instruction log (transformation passes)
+
+Function: make delegation and constraint visible.
+
+### Prompt Log entry template (tokenized)
+
+* `LOG_ID`
+* `TIMESTAMP`
+* `SECTION_ID`
+* `INPUT_ARTIFACT_ID`
+* `OUTPUT_ARTIFACT_ID`
+* `PASS_TYPE` (stay_close, signposting, reference_check, format, coherence, coupling_injection)
+* `CONSTRAINTS_APPLIED`
+
+  * `TERM_LOCK_ENFORCED: {TRUE|FALSE}`
+  * `VOICE_SPEC_ENFORCED: {VOICE_SPEC_ID}`
+  * `STYLE_CONSTRAINTS: {LIST}`
+  * `NO_CUTS: {TRUE|FALSE}`
+* `OPERATORS_USED` (from Operator Set v1)
+* `PROMPT_TEXT` (or “manual edit summary”)
+* `NOTES`
+
+---
+
+## A3. Decision register (short entries, fixed syntax)
+
+Syntax enforced by the app:
+
+**Changed `{X}` because risk `{Y}`; verified by `{Z}`.**
+
+Your existing entries become canonical examples inside the app:
+
+* Changed macro-structure to hourglass scaffold because reviewer auditability risk was high; verified by section functions and transition checks.
+* Locked vocabulary because term drift converts into conceptual instability; verified by term-lock sweep across sections.
+* Drafted front matter late because early introductions create false coherence; verified by matching abstract and intro claims to final outputs.
+* Injected cross-arm reaction examples because arms risked reading as collage; verified by coupling checklist completion.
+* Separated mediation from accountability because disclosure can become purity policing; verified by explicit chain-of-production evidence.
+* Ran reference check pass because citation instability is a primary pathway risk; verified by citation-to-claim mapping and consistent style rules.
+* Performed cadence pass using Read Loud because friction triggers dropout and suspicion; verified by tracked micro-edits.
+* Removed em dashes and decorative separators because rendering defects and style drift degrade professionalism; verified by formatting scan.
+
+---
+
+## A4. Coupling checklist (three-arm anchors present)
+
+App renders your checklist as a structured control sheet.
+
+**Columns**
+
+* `CORE_MECHANISM`
+* `ACADEMIC_ANCHOR: {YES|PARTIAL|NO}`
+* `ARTISTIC_ANCHOR: {YES|PARTIAL|NO}`
+* `RITUAL_ANCHOR: {YES|PARTIAL|NO}`
+* `LOCATION_NOTES`
+
+---
+
+## A5. Cadence validation note (Read Loud pass)
+
+Stored as:
+
+* `CADENCE_NOTE` (rationale + constraints)
+* `EDIT_LIST` (atomic edits, each tagged to section + paragraph)
+
+---
+
+# APPENDIX B (one-page diagram)
+
+The app outputs a single diagram view with:
+
+* phases
+* gates
+* artifacts
+* loops
+* consequence checks
+
+Text version is exactly your phase map, now treated as the app’s canonical “workflow diagram export.”
+
+---
+
+# VOICE SPEC + OPERATOR SET (integrated as controls, not advice)
+
+## Voice Spec v1 becomes a project-level constraint profile
+
+**Protect-at-all-costs**
+
+* spiral recursion that adds a new lever
+* refusal of simple binaries
+* controlled heat without moral mood
+* texture, no summary-bleach
+
+**Leak-point guards**
+
+* enforce “one anchor per paragraph” in high-density zones
+* enforce “claim early” when knife sentence arrives late
+* enforce “recursion test” to separate productive recursion from redundancy
+* enforce term-lock discipline
+
+## Operator Set v1 becomes the app’s rewrite action menu
+
+Operators are logged automatically when used:
+
+* `CLAIM_EARLY`
+* `ANCHOR_INJECTION`
+* `RECURSION_TEST`
+* `TERM_LOCK`
+* `BRIDGE_SENTENCE`
+* `HEDGE_CALIBRATION`
+* `CITATION_TIGHTENING`
+
+Each operator invocation writes to `PROMPT_LOG` and can trigger verification steps.
+
+---
+
+# TOKEN AND PLACEHOLDER SYSTEM (for HENRY)
+
+Use these tokens across exports, logs, and UI:
+
+## Project tokens
+
+* `{PROJECT_ID}`
+* `{TITLE_WORKING}`
+* `{VOICE_SPEC_ID}`
+* `{TERM_LOCK_SET}`
+* `{STYLE_CONSTRAINTS}`
+* `{DATE}`
+
+## Section tokens
+
+* `{SECTION_ID}`
+* `{SECTION_NAME}`
+* `{SECTION_FUNCTION}`
+* `{VERSION}` (v1, v2, v3)
+* `{ARTIFACT_ID}`
+
+## Governance tokens
+
+* `{GATE_NAME}`
+* `{GATE_STATUS}` (GO, NO_GO, REPAIR)
+* `{RISK_ID}`
+* `{RISK_TYPE}` (term_drift, over_polish, unstable_cites, purity_policing, coupling_weakness)
+* `{VERIFICATION_CHECK}`
+
+## Log tokens
+
+* `{LOG_ID}`
+* `{PASS_TYPE}`
+* `{OPERATOR_USED}`
+* `{INPUT_ARTIFACT_ID}`
+* `{OUTPUT_ARTIFACT_ID}`
+
+---
+
+## Minimal “Inspectable Packet Export” (what the app should always be able to generate)
+
+1. Section version stack table
+2. Prompt and instruction log
+3. Decision register
+4. Coupling checklist
+5. Cadence note + edit list
+6. One-page workflow diagram
+7. Verification ledger (citation-to-claim map, term-lock sweep, risk scan results)
+
+---
+
+

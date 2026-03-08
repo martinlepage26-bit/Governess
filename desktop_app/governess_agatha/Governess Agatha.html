@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Governess Agatha</title>
+    <link rel="stylesheet" href="assets/app.css">
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body>
+    <div class="page-glow page-glow-left"></div>
+    <div class="page-glow page-glow-right"></div>
+    <main class="studio">
+      <section class="hero-panel">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">
+            <span class="mark-frame"></span>
+            <span class="mark-core"></span>
+            <span class="mark-dot"></span>
+          </div>
+          <div>
+            <p class="eyebrow">Paper Builder Desk App</p>
+            <h1>Governess Agatha</h1>
+            <p class="hero-copy">
+              Build a manuscript pack with HENRY workflow logic, review pressure,
+              and clean export tools, all offline on your Desktop.
+            </p>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <button id="build-pack" class="button button-primary">Build Project Pack</button>
+          <button id="download-pack" class="button">Download Full Pack</button>
+          <button id="copy-current" class="button button-ghost">Copy Current Tab</button>
+        </div>
+        <div class="status-row">
+          <div class="status-card">
+            <span class="status-label">Mode</span>
+            <strong>HENRY + Governess</strong>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Workflow</span>
+            <strong>Inspectable</strong>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Exports</span>
+            <strong>Markdown + TXT</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace-grid">
+        <aside class="control-panel">
+          <div class="panel-header">
+            <h2>Project Intake</h2>
+            <p>Lock the scope before the draft starts lying to you.</p>
+          </div>
+
+          <label class="field">
+            <span>Project title</span>
+            <input id="project-title" type="text" placeholder="Example: Governing Suspicion in Platform Medicine">
+          </label>
+
+          <div class="field-grid">
+            <label class="field">
+              <span>Genre</span>
+              <select id="genre">
+                <option value="Empirical IMRaD">Empirical IMRaD</option>
+                <option value="Humanities argument">Humanities argument</option>
+                <option value="Mixed methods / policy">Mixed methods / policy</option>
+                <option value="Critical essay">Critical essay</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Claim type</span>
+              <select id="claim-type">
+                <option value="Descriptive">Descriptive</option>
+                <option value="Associational">Associational</option>
+                <option value="Causal">Causal</option>
+                <option value="Normative">Normative</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="field-grid">
+            <label class="field">
+              <span>Venue or class</span>
+              <input id="venue" type="text" placeholder="Journal, class, or committee">
+            </label>
+
+            <label class="field">
+              <span>Citation style</span>
+              <input id="citation-style" type="text" placeholder="APA 7, Chicago, Vancouver">
+            </label>
+          </div>
+
+          <div class="field-grid">
+            <label class="field">
+              <span>Word target</span>
+              <input id="word-target" type="text" placeholder="6000 to 8000 words">
+            </label>
+
+            <label class="field">
+              <span>Abstract target</span>
+              <input id="abstract-target" type="text" placeholder="250 words">
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Locked vocabulary</span>
+            <input id="locked-terms" type="text" placeholder="glitch, seam, charging, proof regime">
+          </label>
+
+          <label class="field">
+            <span>Method or material</span>
+            <input id="method-material" type="text" placeholder="Interviews, archive, policy corpus, field notes">
+          </label>
+
+          <label class="field">
+            <span>Source notes or raw bullets</span>
+            <textarea id="source-notes" rows="14" placeholder="Paste rough notes, bullets, source fragments, or reviewer comments here. One point per line works best."></textarea>
+          </label>
+
+          <div class="toggle-grid">
+            <label class="toggle-card">
+              <input id="governess-mode" type="checkbox" checked>
+              <span>Use Governess support register</span>
+            </label>
+            <label class="toggle-card">
+              <input id="strict-review" type="checkbox" checked>
+              <span>Run strict Reviewer #2 pressure</span>
+            </label>
+          </div>
+
+          <div class="control-actions">
+            <button id="load-sample" class="button">Load Sample Notes</button>
+            <button id="download-current" class="button">Download Current Tab</button>
+            <button id="clear-form" class="button button-ghost">Clear</button>
+          </div>
+
+          <div class="reference-card">
+            <h3>Reference shelf</h3>
+            <a href="reference/Henry.txt" target="_blank" rel="noreferrer">Open HENRY prompt spec</a>
+            <a href="reference/HENRY APP WF.txt" target="_blank" rel="noreferrer">Open workflow packet</a>
+            <a href="reference/HENRY WF Sum.txt" target="_blank" rel="noreferrer">Open workflow summary</a>
+          </div>
+        </aside>
+
+        <section class="output-panel">
+          <div class="panel-header panel-header-inline">
+            <div>
+              <h2>Build Outputs</h2>
+              <p>Each tab updates from the same locked intake.</p>
+            </div>
+            <div class="mini-stats">
+              <div class="mini-stat">
+                <span>Claims</span>
+                <strong id="claim-count">0</strong>
+              </div>
+              <div class="mini-stat">
+                <span>Keywords</span>
+                <strong id="keyword-count">0</strong>
+              </div>
+              <div class="mini-stat">
+                <span>Review risk</span>
+                <strong id="risk-count">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="tabs" role="tablist" aria-label="Governess Agatha output tabs">
+            <button class="tab-button is-active" data-tab="pipeline" type="button">Pipeline</button>
+            <button class="tab-button" data-tab="skeleton" type="button">Skeleton</button>
+            <button class="tab-button" data-tab="matrix" type="button">Evidence Map</button>
+            <button class="tab-button" data-tab="review" type="button">Reviewer Pack</button>
+            <button class="tab-button" data-tab="prompt" type="button">Prompt Deck</button>
+          </div>
+
+          <section class="tab-panel is-active" data-panel="pipeline">
+            <div class="tab-toolbar">
+              <span>Live workflow view from intake lock through review pressure and export.</span>
+            </div>
+            <textarea id="output-pipeline" class="output-box" spellcheck="false"></textarea>
+          </section>
+
+          <section class="tab-panel" data-panel="skeleton">
+            <div class="tab-toolbar">
+              <span>Manuscript skeleton with title options, section logic, and cadence reminders.</span>
+            </div>
+            <textarea id="output-skeleton" class="output-box" spellcheck="false"></textarea>
+          </section>
+
+          <section class="tab-panel" data-panel="matrix">
+            <div class="tab-toolbar">
+              <span>Claim to evidence map for quick audit and reviewer defense.</span>
+            </div>
+            <textarea id="output-matrix" class="output-box" spellcheck="false"></textarea>
+          </section>
+
+          <section class="tab-panel" data-panel="review">
+            <div class="tab-toolbar">
+              <span>Layered review sequence with major risks and bounded fixes.</span>
+            </div>
+            <textarea id="output-review" class="output-box" spellcheck="false"></textarea>
+          </section>
+
+          <section class="tab-panel" data-panel="prompt">
+            <div class="tab-toolbar">
+              <span>Ready-to-paste HENRY instructions tailored to the project.</span>
+            </div>
+            <textarea id="output-prompt" class="output-box" spellcheck="false"></textarea>
+          </section>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
