@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Governess Triangulation Studio</title>
+  <style>
+    :root {
+      --paper: #fbf5ec;
+      --paper-2: rgba(255, 251, 246, 0.88);
+      --ink: #1e2743;
+      --muted: #5f6d8b;
+      --navy: #24406f;
+      --navy-2: #4f78b2;
+      --rose: #d88697;
+      --gold: #d7b06a;
+      --mint: #b8d7c7;
+      --line: rgba(36, 64, 111, 0.12);
+      --shadow: 0 24px 56px rgba(27, 41, 76, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(215, 176, 106, 0.16), transparent 24%),
+        radial-gradient(circle at 85% 10%, rgba(216, 134, 151, 0.14), transparent 26%),
+        linear-gradient(180deg, #f9f2e7 0%, #efe7d9 100%);
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(8px);
+    }
+
+    body::before {
+      width: 260px;
+      height: 260px;
+      left: -90px;
+      top: 140px;
+      background: rgba(184, 215, 199, 0.3);
+    }
+
+    body::after {
+      width: 300px;
+      height: 300px;
+      right: -110px;
+      bottom: 40px;
+      background: rgba(79, 120, 178, 0.16);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, calc(100vw - 32px));
+      margin: 24px auto 40px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--paper-2);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero {
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at top right, rgba(184, 215, 199, 0.34), transparent 32%),
+        linear-gradient(135deg, rgba(255, 252, 247, 0.96), rgba(250, 243, 232, 0.92));
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      right: -40px;
+      top: -120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(79, 120, 178, 0.16), transparent 66%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(36, 64, 111, 0.08);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 22px;
+      align-items: start;
+      margin-top: 18px;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      letter-spacing: -0.03em;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4vw, 3.7rem);
+      line-height: 0.96;
+      max-width: 10ch;
+    }
+
+    .hero p,
+    .subhead,
+    .result-copy,
+    label span,
+    .stat small,
+    .tip,
+    .error {
+      color: var(--muted);
+    }
+
+    .hero p {
+      max-width: 62ch;
+      line-height: 1.65;
+      margin: 14px 0 0;
+    }
+
+    .mini-board {
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(36, 64, 111, 0.08);
+    }
+
+    .mini-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(246, 239, 229, 0.76));
+      border: 1px solid rgba(36, 64, 111, 0.08);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.3rem;
+      margin-bottom: 6px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .controls,
+    .results {
+      border-radius: var(--radius-xl);
+      padding: 24px;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--ink);
+      padding: 11px 16px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 800;
+      transition: transform 140ms ease, background-color 140ms ease;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, var(--navy), var(--navy-2));
+      color: white;
+      border-color: transparent;
+    }
+
+    .tab:hover {
+      transform: translateY(-1px);
+    }
+
+    form {
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid rgba(36, 64, 111, 0.14);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    input:focus {
+      outline: 2px solid rgba(79, 120, 178, 0.22);
+      border-color: rgba(79, 120, 178, 0.4);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.84);
+    }
+
+    .button.primary {
+      color: white;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--navy), var(--navy-2));
+    }
+
+    .tip {
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+
+    .card {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.76);
+      border: 1px solid rgba(36, 64, 111, 0.08);
+    }
+
+    .card + .card {
+      margin-top: 14px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .result-value {
+      font-size: 1.48rem;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .result-copy {
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    pre {
+      margin: 14px 0 0;
+      padding: 16px;
+      border-radius: 18px;
+      overflow: auto;
+      background: #1d2741;
+      color: #f4f7ff;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .error {
+      min-height: 1.4em;
+      font-weight: 700;
+      color: #a65066;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(184, 215, 199, 0.28);
+      color: #215648;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .status-pill::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #2f7b6a;
+      box-shadow: 0 0 0 5px rgba(47, 123, 106, 0.12);
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .workspace,
+      .field-grid,
+      .result-grid,
+      .mini-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero panel">
+      <span class="eyebrow">Governess Triangulation Studio</span>
+      <div class="hero-grid">
+        <div>
+          <h1>Small geometry, crisp answers.</h1>
+          <p>
+            Use angle-based triangulation in two ways: solve a full triangle from one baseline and two angles,
+            or locate a target from two sensor positions and two bearings. The interface calls the same deterministic
+            Python toolkit that now lives in the repository.
+          </p>
+        </div>
+        <aside class="mini-board">
+          <h2>What this solves</h2>
+          <div class="mini-grid">
+            <div class="stat">
+              <strong>Triangle</strong>
+              <small>Known side `AB` plus angles `A` and `B`</small>
+            </div>
+            <div class="stat">
+              <strong>Target</strong>
+              <small>Two sensor coordinates plus two bearing angles</small>
+            </div>
+            <div class="stat">
+              <strong>Output</strong>
+              <small>Plain-language results and machine-readable JSON</small>
+            </div>
+            <div class="stat">
+              <strong>Guardrails</strong>
+              <small>Rejects invalid triangles and near-parallel sight lines</small>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="controls panel">
+        <h2>Inputs</h2>
+        <p class="subhead">Switch modes, enter the numbers, and the page will call the matching API route.</p>
+        <div class="tabs">
+          <button class="tab active" data-mode="triangle">Triangle</button>
+          <button class="tab" data-mode="target">Target</button>
+        </div>
+
+        <form id="triangle-form">
+          <div class="field-grid">
+            <label>
+              <span>Baseline AB</span>
+              <input type="number" step="any" name="ab" value="10">
+            </label>
+            <label>
+              <span>Angle A (degrees)</span>
+              <input type="number" step="any" name="angle_a" value="30">
+            </label>
+            <label>
+              <span>Angle B (degrees)</span>
+              <input type="number" step="any" name="angle_b" value="60">
+            </label>
+          </div>
+          <div class="actions">
+            <button class="button primary" type="submit">Solve Triangle</button>
+            <button class="button" type="button" data-fill="triangle">Load Example</button>
+          </div>
+          <div class="tip">Rule of thumb: `A + B` must stay below `180` degrees.</div>
+        </form>
+
+        <form id="target-form" hidden>
+          <div class="field-grid">
+            <label>
+              <span>Sensor 1 X</span>
+              <input type="number" step="any" name="x1" value="0">
+            </label>
+            <label>
+              <span>Sensor 1 Y</span>
+              <input type="number" step="any" name="y1" value="0">
+            </label>
+            <label>
+              <span>Sensor 2 X</span>
+              <input type="number" step="any" name="x2" value="10">
+            </label>
+            <label>
+              <span>Sensor 2 Y</span>
+              <input type="number" step="any" name="y2" value="0">
+            </label>
+            <label>
+              <span>Bearing θ1</span>
+              <input type="number" step="any" name="theta1" value="45">
+            </label>
+            <label>
+              <span>Bearing θ2</span>
+              <input type="number" step="any" name="theta2" value="135">
+            </label>
+          </div>
+          <div class="actions">
+            <button class="button primary" type="submit">Locate Target</button>
+            <button class="button" type="button" data-fill="target">Load Example</button>
+          </div>
+          <div class="tip">Angles use math coordinates by default: counterclockwise from the positive x-axis.</div>
+        </form>
+      </div>
+
+      <div class="results panel">
+        <h2>Results</h2>
+        <p class="subhead">The cards summarize the answer, and the raw JSON stays visible for debugging or automation.</p>
+
+        <div class="card">
+          <span class="status-pill">API-backed deterministic output</span>
+          <div id="result-panel"></div>
+          <div class="error" id="error"></div>
+        </div>
+
+        <div class="card">
+          <h3>Raw JSON</h3>
+          <pre id="raw-json">{}</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const tabs = [...document.querySelectorAll(".tab")];
+    const triangleForm = document.getElementById("triangle-form");
+    const targetForm = document.getElementById("target-form");
+    const resultPanel = document.getElementById("result-panel");
+    const rawJson = document.getElementById("raw-json");
+    const errorNode = document.getElementById("error");
+
+    function setMode(mode) {
+      tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.mode === mode));
+      triangleForm.hidden = mode !== "triangle";
+      targetForm.hidden = mode !== "target";
+      errorNode.textContent = "";
+    }
+
+    function formToObject(form) {
+      const data = new FormData(form);
+      return Object.fromEntries([...data.entries()].map(([key, value]) => [key, Number(value)]));
+    }
+
+    function renderTriangle(data) {
+      resultPanel.innerHTML = `
+        <div class="result-grid">
+          <div class="card">
+            <div>Angle C</div>
+            <div class="result-value">${data.angle_c_deg.toFixed(6)}°</div>
+          </div>
+          <div class="card">
+            <div>Side AC</div>
+            <div class="result-value">${data.ac.toFixed(6)}</div>
+          </div>
+          <div class="card">
+            <div>Side BC</div>
+            <div class="result-value">${data.bc.toFixed(6)}</div>
+          </div>
+          <div class="card">
+            <div>Baseline AB</div>
+            <div class="result-value">${data.ab.toFixed(6)}</div>
+          </div>
+        </div>
+        <p class="result-copy">This triangle is fully determined because one side and two angles are enough to compute the remaining angle and the two unknown sides via the Law of Sines.</p>
+      `;
+    }
+
+    function renderTarget(data) {
+      resultPanel.innerHTML = `
+        <div class="result-grid">
+          <div class="card">
+            <div>Target X</div>
+            <div class="result-value">${data.target[0].toFixed(6)}</div>
+          </div>
+          <div class="card">
+            <div>Target Y</div>
+            <div class="result-value">${data.target[1].toFixed(6)}</div>
+          </div>
+          <div class="card">
+            <div>Distance from Sensor 1</div>
+            <div class="result-value">${data.distance_from_sensor_1.toFixed(6)}</div>
+          </div>
+          <div class="card">
+            <div>Distance from Sensor 2</div>
+            <div class="result-value">${data.distance_from_sensor_2.toFixed(6)}</div>
+          </div>
+        </div>
+        <p class="result-copy">The target is the forward intersection of the two bearing rays. If the rays become parallel or the intersection falls behind either sensor, the API returns a validation error instead.</p>
+      `;
+    }
+
+    async function submitForm(form, endpoint, renderer) {
+      errorNode.textContent = "";
+      const payload = formToObject(form);
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        rawJson.textContent = JSON.stringify(data, null, 2);
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Request failed.");
+        }
+
+        renderer(data);
+      } catch (error) {
+        resultPanel.innerHTML = "";
+        errorNode.textContent = error.message;
+      }
+    }
+
+    triangleForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await submitForm(triangleForm, "/api/triangulation/triangle", renderTriangle);
+    });
+
+    targetForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await submitForm(targetForm, "/api/triangulation/target", renderTarget);
+    });
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => setMode(tab.dataset.mode));
+    });
+
+    document.querySelector('[data-fill="triangle"]').addEventListener("click", () => {
+      triangleForm.reset();
+      triangleForm.ab.value = 10;
+      triangleForm.angle_a.value = 30;
+      triangleForm.angle_b.value = 60;
+    });
+
+    document.querySelector('[data-fill="target"]').addEventListener("click", () => {
+      targetForm.reset();
+      targetForm.x1.value = 0;
+      targetForm.y1.value = 0;
+      targetForm.x2.value = 10;
+      targetForm.y2.value = 0;
+      targetForm.theta1.value = 45;
+      targetForm.theta2.value = 135;
+    });
+
+    submitForm(triangleForm, "/api/triangulation/triangle", renderTriangle);
+  </script>
+</body>
+</html>

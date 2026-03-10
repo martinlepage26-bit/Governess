@@ -1,9 +1,14 @@
+import asyncio
 import math
+import os
 import subprocess
 import sys
 import unittest
 from pathlib import Path
 
+os.environ.setdefault("MONGO_URL", "mongodb://localhost:27017")
+
+import server
 from triangulation.solver import solve_target_from_bearings, solve_triangle
 
 
@@ -71,6 +76,47 @@ class TriangulationCliTests(unittest.TestCase):
             text=True,
         )
         self.assertIn("Target: (5.000000, 5.000000)", result.stdout)
+
+
+class TriangulationApiTests(unittest.TestCase):
+    def test_triangle_route_returns_solution(self) -> None:
+        result = asyncio.run(
+            server.triangulation_triangle(
+                server.TriangleSolveInput(ab=10.0, angle_a=30.0, angle_b=60.0)
+            )
+        )
+        self.assertEqual(result["angle_c_deg"], 90.0)
+        self.assertAlmostEqual(result["ac"], 8.6602540378)
+
+    def test_triangle_route_returns_400_for_invalid_triangle(self) -> None:
+        with self.assertRaises(server.HTTPException) as ctx:
+            asyncio.run(
+                server.triangulation_triangle(
+                    server.TriangleSolveInput(ab=10.0, angle_a=100.0, angle_b=80.0)
+                )
+            )
+        self.assertEqual(ctx.exception.status_code, 400)
+
+    def test_target_route_returns_solution(self) -> None:
+        result = asyncio.run(
+            server.triangulation_target(
+                server.TargetSolveInput(
+                    x1=0.0,
+                    y1=0.0,
+                    x2=10.0,
+                    y2=0.0,
+                    theta1=45.0,
+                    theta2=135.0,
+                )
+            )
+        )
+        self.assertAlmostEqual(result["target"][0], 5.0)
+        self.assertAlmostEqual(result["target"][1], 5.0)
+
+    def test_ui_route_returns_html(self) -> None:
+        response = asyncio.run(server.triangulation_ui())
+        self.assertIn("Governess Triangulation Studio", response.body.decode("utf-8"))
+        self.assertIn("/api/triangulation/triangle", response.body.decode("utf-8"))
 
 
 if __name__ == "__main__":

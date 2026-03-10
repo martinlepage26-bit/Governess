@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -11,6 +12,8 @@ from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 import resend
+
+from triangulation.solver import solve_target_from_bearings, solve_triangle
 
 # ----------------------------
 # Logging MUST be configured before get_database() uses logger
@@ -192,6 +195,21 @@ class BookingCreate(BaseModel):
 class BookingStatusUpdate(BaseModel):
     status: str
 
+
+class TriangleSolveInput(BaseModel):
+    ab: float
+    angle_a: float
+    angle_b: float
+
+
+class TargetSolveInput(BaseModel):
+    x1: float
+    y1: float
+    x2: float
+    y2: float
+    theta1: float
+    theta2: float
+
 # ─── FAQ Models ───
 
 class FAQItem(BaseModel):
@@ -284,6 +302,37 @@ async def root_health_check():
 @api_router.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+@app.get("/triangulation", response_class=HTMLResponse)
+async def triangulation_ui():
+    page_path = ROOT_DIR / "triangulation" / "web" / "index.html"
+    return HTMLResponse(page_path.read_text(encoding="utf-8"))
+
+
+@api_router.post("/triangulation/triangle")
+async def triangulation_triangle(input: TriangleSolveInput):
+    try:
+        solution = solve_triangle(input.ab, input.angle_a, input.angle_b)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return solution.as_dict()
+
+
+@api_router.post("/triangulation/target")
+async def triangulation_target(input: TargetSolveInput):
+    try:
+        solution = solve_target_from_bearings(
+            input.x1,
+            input.y1,
+            input.x2,
+            input.y2,
+            input.theta1,
+            input.theta2,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return solution.as_dict()
 
 # ─── Status ───
 
